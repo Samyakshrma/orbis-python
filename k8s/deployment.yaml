@@ -1,40 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dockerfile-generator
-  labels:
-    app: dockerfile-generator
+  name: orbis-python-deployment
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: dockerfile-generator
+      app: orbis-python
   template:
     metadata:
       labels:
-        app: dockerfile-generator
+        app: orbis-python
     spec:
       containers:
-      - name: dockerfile-generator
-        image: dockerfile-generator:latest
-        ports:
-        - containerPort: 8000
-        resources:
-          requests:
-            memory: "128Mi"
-            cpu: "100m"
-          limits:
-            memory: "256Mi"
-            cpu: "200m"
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 8000
-          initialDelaySeconds: 5
-          periodSeconds: 10
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 8000
-          initialDelaySeconds: 15
-          periodSeconds: 20 
+        - name: orbis-python
+          image: orbis-python:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
