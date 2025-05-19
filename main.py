@@ -169,6 +169,9 @@ async def generate_docker(file: UploadFile = File(...)):
 
     finally:
         shutil.rmtree(temp_dir, ignore_errors=True)
+@app.post("/generate-k8s")
+async def hellothere():
+    return "Hello there Nigger"
 
 @app.post("/generate-k8s")
 async def generate_k8s(file: UploadFile = File(...)):
