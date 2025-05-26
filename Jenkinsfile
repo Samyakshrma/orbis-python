@@ -1,10 +1,17 @@
 pipeline {
     agent any
 
+    environment {
+        // KUBECONFIG points to the Jenkins user's kubeconfig location
+        KUBECONFIG = '/var/lib/jenkins/.kube/config'
+        // Use python3 explicitly to avoid confusion with python or python2
+        PATH = "${env.WORKSPACE}/venv/bin:${env.PATH}"
+    }
+
     stages {
         stage('Clone') {
             steps {
-                git 'https://github.com/Samyakshrma/orbis-python.git'
+                git branch: 'main', url: 'https://github.com/Samyakshrma/orbis-python.git'
             }
         }
 
@@ -25,15 +32,21 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("orbis-python")
+                    // Tag image with build number to avoid overwriting previous images
+                    def imageTag = "orbis-python:${env.BUILD_NUMBER}"
+                    docker.build(imageTag)
+                    // Optionally, push to a registry here if needed
                 }
             }
         }
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh 'kubectl apply -f k8s/deployment.yaml'
-                sh 'kubectl apply -f k8s/service.yaml'
+                // Make sure kubeconfig is set and accessible by kubectl
+                sh '''
+                    kubectl apply -f k8s/deployment.yaml
+                    kubectl apply -f k8s/service.yaml
+                '''
             }
         }
     }
@@ -44,4 +57,3 @@ pipeline {
         }
     }
 }
-
